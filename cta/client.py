@@ -38,6 +38,11 @@ class Transit:
         r = requests.get(self.url + endpoint, params=params)
         return r.json()
 
+    def assert_id_len(self, *args):
+        for arg in args:
+            if arg:
+                assert len(str(arg)) == 5, 'Station and stop IDs should be 5 characters'
+
 
 class Train(Transit):
     """
@@ -48,8 +53,18 @@ class Train(Transit):
         url = 'http://lapi.transitchicago.com/api/1.0/'
         Transit.__init__(self, key, url)
 
-    def get_arrivals(self, station_id=None, stop_id=None, max_results=None, route=None):
+    def get_arrivals(self, station_id=None, stop_id=None, max_results=None, route_code=None):
+        """
+        # get_arrivals
+        parameters:
+        - station_id: required if stop_id not specified
+        - stop_id: required if station_id not specified
+        - max_results: optional
+        - route_code: optional
+        """
+
         assert bool(station_id) != bool(stop_id), "Specify exactly one of station_id or stop_id"
+        self.assert_id_len(station_id, stop_id)
 
         endpoint = 'ttarrivals.aspx'
 
@@ -57,7 +72,7 @@ class Train(Transit):
             'mapid': station_id,
             'stpid': stop_id,
             'max': max_results,
-            'rt': route,
+            'rt': route_code,
         }
 
         return self.request(endpoint, params)
@@ -79,17 +94,17 @@ class Bus(Transit):
         url = 'http://ctabustracker.com/bustime/api/v2/'
         Transit.__init__(self, key, url)
 
-    def get_stops(self, route, direction):
+    def get_stops(self, route_code, direction):
         """
         # get_stops
         parameters:
-        - route: bus route number
+        - route_code: bus route number
         - direction: nb, sb, eb, wb
         """
         endpoint = 'getstops'
 
         params = {
-            'rt': route,
+            'rt': route_code,
             'dir': self.dir_abbrev[direction],
         }
 
