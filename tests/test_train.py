@@ -30,3 +30,13 @@ def test_get_arrivals_args(conn, args):
 def test_get_arrivals_kwargs(conn, kwargs):
     with pytest.raises(AssertionError):
         conn.train.get_arrivals(**kwargs)
+
+
+def test_get_locations_exception(conn):
+    with pytest.raises(AssertionError):
+        conn.train.get_locations('Green')
+
+
+def test_follow_exception(conn):
+    with pytest.raises(ValueError):
+        conn.train.follow('a')

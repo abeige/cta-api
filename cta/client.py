@@ -32,8 +32,6 @@ class Transit:
 
     def request(self, endpoint, params):
         params['key'] = self.key
-        params['outputType'] = 'json'
-        params['format'] = 'json'
 
         r = requests.get(self.url + endpoint, params=params)
         return r.json()
@@ -56,7 +54,8 @@ class Train(Transit):
     def get_arrivals(self, station_id=None, stop_id=None, max_results=None, route_code=None):
         """
         # get_arrivals
-        parameters:
+
+        #### Parameters:
         - station_id: required if stop_id not specified
         - stop_id: required if station_id not specified
         - max_results: optional
@@ -67,12 +66,61 @@ class Train(Transit):
         self.assert_id_len(station_id, stop_id)
 
         endpoint = 'ttarrivals.aspx'
-
         params = {
             'mapid': station_id,
             'stpid': stop_id,
             'max': max_results,
             'rt': route_code,
+            'outputType': 'json',
+        }
+
+        return self.request(endpoint, params)
+
+    def follow(self, run_number):
+        """
+        # follow
+
+        This API produces a list of arrival predictions for a given train at all subsequent stations for which that
+        train is estimated to arrive, up to 20 minutes in the future or to the end of its trip.
+
+        #### Parameters:
+        - run_number: single run number for a train
+        """
+
+        endpoint = 'ttfollow.aspx'
+        params = {
+            'runnumber': int(run_number),
+            'outputType': 'json',
+        }
+
+        return self.request(endpoint, params)
+
+    def get_locations(self, route):
+        """
+        # get_locations
+
+        This API produces a list of arrival predictions for a given train at all subsequent stations for which that
+        train is estimated to arrive, up to 20 minutes in the future or to the end of its trip.
+
+        #### Parameters:
+        - route: one or more of the following routes
+            - Red
+            - Org
+            - Y
+            - G
+            - Blue
+            - P/Pexp
+            - Pink
+            - Brn
+        """
+
+        valid_routes = ( 'Red', 'Org', 'Y', 'G', 'Blue', 'P', 'Pexp', 'Pink', 'Brn' )
+        assert route in valid_routes, "Route should be one of Red, Org, Y, G, Blue, P, Pexp, Pink, Brn"
+
+        endpoint = 'ttpositions.aspx'
+        params = {
+            'rt': route,
+            'outputType': 'json',
         }
 
         return self.request(endpoint, params)
@@ -101,11 +149,12 @@ class Bus(Transit):
         - route_code: bus route number
         - direction: nb, sb, eb, wb
         """
-        endpoint = 'getstops'
 
+        endpoint = 'getstops'
         params = {
             'rt': route_code,
             'dir': self.dir_abbrev[direction],
+            'format': 'json',
         }
 
         return self.request(endpoint, params)
