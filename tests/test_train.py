@@ -12,23 +12,16 @@ def test_get_arrivals_type(conn):
     assert type(arrivals) == dict
 
 
-def test_get_arrivals_exception(conn):
-    # station_id too short (default)
+@pytest.mark.parametrize("args", [(), (80), (80, 80), (12345, 12345)])
+def test_get_arrivals_args(conn, args):
     with pytest.raises(AssertionError):
-        conn.train.get_arrivals(80)
+        conn.train.get_arrivals(args)
 
-    # can't specify both, both too short
-    with pytest.raises(AssertionError):
-        conn.train.get_arrivals(80, 80)
 
-    # can't specify both
+@pytest.mark.parametrize('kwargs', [
+    {'station_id':80},
+    {'stop_id':80}
+])
+def test_get_arrivals_kwargs(conn, kwargs):
     with pytest.raises(AssertionError):
-        conn.train.get_arrivals(12345, 12345)
-
-    # station_id too short
-    with pytest.raises(AssertionError):
-        conn.train.get_arrivals(station_id=80)
-
-    # stop_id too short
-    with pytest.raises(AssertionError):
-        conn.train.get_arrivals(stop_id=80)
+        conn.train.get_arrivals(**kwargs)
