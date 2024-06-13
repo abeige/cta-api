@@ -38,8 +38,11 @@ class Transit:
 
     def assert_id_len(self, *args):
         for arg in args:
-            if arg:
-                assert len(str(arg)) == 5, 'Station and stop IDs should be 5 characters'
+            if arg is not None:
+                if type(self) == Bus:
+                    assert int(arg) >= 0 and int(arg) < 30000, 'Bus stop IDs should be between 0 and 29999'
+                elif type(self) == Train:
+                    assert int(arg) >= 30000 and int(arg) < 50000, 'Train station and stop IDs should be between 30000 and 49999'
 
 
 class Train(Transit):

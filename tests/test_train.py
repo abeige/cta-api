@@ -3,12 +3,12 @@ import cta
 
 
 @pytest.fixture
-def conn():
+def client():
     return cta.TransitClient()
 
 
-def test_get_arrivals_type(conn):
-    arrivals = conn.train.get_arrivals(41220)
+def test_get_arrivals_type(client):
+    arrivals = client.train.get_arrivals(41220)
     assert type(arrivals) == dict
 
 
@@ -18,25 +18,25 @@ def test_get_arrivals_type(conn):
     (80, 80),
     (12345, 12345),
 ])
-def test_get_arrivals_args(conn, args):
+def test_get_arrivals_args(client, args):
     with pytest.raises(AssertionError):
-        conn.train.get_arrivals(*args)
+        client.train.get_arrivals(*args)
 
 
 @pytest.mark.parametrize('kwargs', [
     {'station_id':80},
     {'stop_id':80},
 ])
-def test_get_arrivals_kwargs(conn, kwargs):
+def test_get_arrivals_kwargs(client, kwargs):
     with pytest.raises(AssertionError):
-        conn.train.get_arrivals(**kwargs)
+        client.train.get_arrivals(**kwargs)
 
 
-def test_get_locations_exception(conn):
+def test_get_locations_exception(client):
     with pytest.raises(AssertionError):
-        conn.train.get_locations('Green')
+        client.train.get_locations('Green')
 
 
-def test_follow_exception(conn):
+def test_follow_exception(client):
     with pytest.raises(ValueError):
-        conn.train.follow('a')
+        client.train.follow('a')
