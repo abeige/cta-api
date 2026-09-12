@@ -40,3 +40,16 @@ def test_get_locations_exception(client):
 def test_follow_exception(client):
     with pytest.raises(ValueError):
         client.train.follow('a')
+
+
+def test_get_arrivals(client):
+    assert 'ctatt' in client.train.get_arrivals(40380)
+
+
+def test_follow(client):
+    run_number = client.train.get_arrivals(40380)['ctatt']['eta'][0]['rn']
+    assert 'ctatt' in client.train.follow(run_number)
+
+
+def test_get_locations(client):
+    assert 'ctatt' in client.train.get_locations('Red')
